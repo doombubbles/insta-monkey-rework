@@ -1,17 +1,8 @@
-<a href="<a href="https://github.com/doombubbles/insta-monkey-rework/releases/latest/download/InstaMonkeyRework.dll"><img align="right" alt="Download" height="75" src="https://github.com/doombubbles/BTD6-Mods/blob/main/download.png?raw=true"></a>
-
-# Indiscriminate Pets
-
-## NOTE: This version of the mod requires BTD6 Mod Helper >v3.0 and MelonLoader >v0.6
-
-Allows trophy store pets to apply to all skins of the hero they're for.
-
-**Changelog**
-
-v1.0.0 Release
-"><img align="right" alt="Download" height="75" src="https://github.com/doombubbles/BTD6-Mods/blob/main/download.png?raw=true"></a>
+<a href="https://github.com/doombubbles/insta-monkey-rework/releases/latest/download/InstaMonkeyRework.dll"><img align="right" alt="Download" height="75" src="https://github.com/doombubbles/BTD6-Mods/blob/main/download.png?raw=true"></a>
 
 # Insta Monkey Rework
+
+## NOTE: This version of the mod requires BTD6 Mod Helper >v3.0 and MelonLoader >v0.6
 
 This mod adds a new way for you to use insta monkeys. 
 Instead of them just being a cheaty, one-time-use bonus, now they can be an actual strategic investment.
@@ -27,8 +18,6 @@ Also, for convenience, you can *Right Click* on a normal tower purchase button a
 With this mod, there's a new layer of decision making involved about whether you're safe enough to save up for a discounted Insta, or you need the immediate value of placing and upgrading a tower normally.
 
 **Changelog**
-
-v1.0.7 Updated for Mod Helper 3.0
 
 v1.0.6 Small Bug Fixes
 
