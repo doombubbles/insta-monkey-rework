@@ -2,7 +2,7 @@
 
 # Insta Monkey Rework
 
-## NOTE: This version of the mod requires BTD6 Mod Helper >v3.0 and MelonLoader >v0.6
+## NOTE: This alpha version of the mod requires BTD6 Mod Helper >v3.0, see [here](https://github.com/doombubbles/BTD6-Mods#readme) for the stable mods
 
 This mod adds a new way for you to use insta monkeys. 
 Instead of them just being a cheaty, one-time-use bonus, now they can be an actual strategic investment.
