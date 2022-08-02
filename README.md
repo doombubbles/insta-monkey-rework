@@ -1,10 +1,12 @@
-<a href="https://github.com/doombubbles/insta-monkey-rework/releases/latest/download/InstaMonkeyRework.dll"><img align="right" alt="Download" height="75" src="https://github.com/doombubbles/BTD6-Mods/blob/main/download.png?raw=true"></a>
+<a href="https://github.com/doombubbles/insta-monkey-rework/releases/latest/download/InstaMonkeyRework.dll">
+    <img align="left" alt="Icon" height="90" src="Icon.png">
+    <img align="right" alt="Download" height="75" src="https://raw.githubusercontent.com/gurrenm3/BTD-Mod-Helper/master/BloonsTD6%20Mod%20Helper/Resources/DownloadBtn.png">
+</a>
 
-# Insta Monkey Rework
+<h1 align="center">Insta-Monkey Rework</h1>
 
-## NOTE: This alpha version of the mod requires BTD6 Mod Helper >v3.0, see [here](https://github.com/doombubbles/BTD6-Mods#readme) for the stable mods
 
-This mod adds a new way for you to use insta monkeys. 
+### Adds a new way for you to use insta monkeys. 
 Instead of them just being a cheaty, one-time-use bonus, now they can be an actual strategic investment.
 
 
@@ -17,4 +19,5 @@ Also, for convenience, you can *Right Click* on a normal tower purchase button a
 
 With this mod, there's a new layer of decision making involved about whether you're safe enough to save up for a discounted Insta, or you need the immediate value of placing and upgrading a tower normally.
 
-**Changelog**
+## NOTE: This alpha version of the mod requires [BTD6 Mod Helper >v3.0](https://github.com/gurrenm3/BTD-Mod-Helper/wiki/Mod-Helper-3.0-Alpha), see [here](https://github.com/doombubbles/BTD6-Mods#readme) for the stable mods
+[![Requires BTD6 Mod Helper](https://raw.githubusercontent.com/gurrenm3/BTD-Mod-Helper/master/banner.png)](https://github.com/gurrenm3/BTD-Mod-Helper#readme)
