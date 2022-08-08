@@ -2,7 +2,7 @@
 
 public static class ModHelperData
 {
-    public const string Version = "1.1.0";
+    public const string Version = "1.1.1";
     public const string Name = "Insta Monkey Rework";
 
     public const string Description =

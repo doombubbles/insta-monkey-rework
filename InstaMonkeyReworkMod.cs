@@ -33,7 +33,7 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
     public static bool ActuallyConsumeInsta;
     public static bool AllowActuallyPlaceInsta;
 
-    public static Dictionary<int, string> SavedPlacedInstas;
+    public static Dictionary<int, string> SavedPlacedInstas = null!;
 
     public override void OnMainMenu()
     {
@@ -47,11 +47,8 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
 
     public static int GetCostForThing(TowerModel towerModel)
     {
-        var cost = Game.instance.model.GetTowerFromId(towerModel.name).cost;
-        foreach (var appliedUpgrade in towerModel.GetAppliedUpgrades())
-        {
-            cost += appliedUpgrade.cost;
-        }
+        var cost = Game.instance.model.GetTowerFromId(towerModel.name).cost +
+                   towerModel.GetAppliedUpgrades().Sum(model => model.cost);
 
         switch (InGame.instance.SelectedDifficulty)
         {
@@ -113,8 +110,7 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
 
     public override void OnUpdate()
     {
-        if (InstaTowersMenu.instaTowersInstance != null && InGame.instance != null
-                                                        && InGame.instance.bridge != null)
+        if (InstaTowersMenu.instaTowersInstance != null && InGame.instance != null && InGame.instance.bridge != null)
         {
             foreach (var button in InstaTowersMenu.instaTowersInstance
                          .GetComponentsInChildren<StandardInstaTowerButton>())
@@ -122,6 +118,7 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
                 var costText = button.GetComponentsInChildren<TextMeshProUGUI>()
                     .FirstOrDefault(text => text.name == "Cost");
                 if (costText == null) continue;
+
                 var cost = TextToInt(costText);
                 costText.color = InGame.instance.GetCash() >= cost ? Color.white : Color.red;
 
@@ -153,9 +150,9 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
 
     public override void OnTowerSaved(Tower tower, TowerSaveDataModel saveData)
     {
-        if (SavedPlacedInstas.ContainsKey(tower.Id))
+        if (SavedPlacedInstas.ContainsKey(tower.Id.Id))
         {
-            saveData.metaData["InstaMonkeyRework"] = SavedPlacedInstas[tower.Id];
+            saveData.metaData["InstaMonkeyRework"] = SavedPlacedInstas[tower.Id.Id];
         }
     }
 
@@ -163,15 +160,15 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
     {
         if (saveData.metaData.ContainsKey("InstaMonkeyRework"))
         {
-            SavedPlacedInstas[tower.Id] = saveData.metaData["InstaMonkeyRework"];
+            SavedPlacedInstas[tower.Id.Id] = saveData.metaData["InstaMonkeyRework"];
         }
     }
 
     public override void OnTowerDestroyed(Tower tower)
     {
-        if (SavedPlacedInstas.ContainsKey(tower.Id))
+        if (SavedPlacedInstas.ContainsKey(tower.Id.Id))
         {
-            SavedPlacedInstas.Remove(tower.Id);
+            SavedPlacedInstas.Remove(tower.Id.Id);
         }
     }
 
@@ -256,9 +253,8 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
                 {
                     cost = GetCostForThing(tower);
                     InGame.instance.AddCash(-cost);
-                    //tower.Sim.RemoveCash(cost, Simulation.CashType.Normal, tower.owner, Simulation.CashSource.TowerBrought);
                     tower.worth = cost;
-                    SavedPlacedInstas[tower.Id] = def.name;
+                    SavedPlacedInstas[tower.Id.Id] = def.name;
                 }
                 else
                 {
@@ -330,8 +326,10 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         [HarmonyPostfix]
         internal static void Postfix(TowerPurchaseButton __instance, PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Right && __instance.towerModel.IsBaseTower &&
-                !__instance.hero && InGame.instance.GetGameModel().powersEnabled)
+            if (eventData.button == PointerEventData.InputButton.Right &&
+                __instance.towerModel.IsBaseTower &&
+                !__instance.hero &&
+                InGameData.CurrentGame.ArePowersAllowed())
             {
                 RightMenu.instance.ShowPowersMenu();
                 PowersMenu.instance.ShowInstaMonkeys();
