@@ -7,6 +7,7 @@ using Assets.Scripts.Models.Towers;
 using Assets.Scripts.Simulation;
 using Assets.Scripts.Simulation.Towers;
 using Assets.Scripts.Unity;
+using Assets.Scripts.Unity.Bridge;
 using Assets.Scripts.Unity.Player;
 using Assets.Scripts.Unity.UI_New.InGame;
 using Assets.Scripts.Unity.UI_New.InGame.RightMenu;
@@ -14,6 +15,8 @@ using Assets.Scripts.Unity.UI_New.InGame.RightMenu.Powers;
 using Assets.Scripts.Unity.UI_New.InGame.StoreMenu;
 using Assets.Scripts.Unity.UI_New.Popups;
 using BTD_Mod_Helper;
+using BTD_Mod_Helper.Api;
+using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
 using InstaMonkeyRework;
@@ -31,7 +34,9 @@ namespace InstaMonkeyRework;
 public class InstaMonkeyReworkMod : BloonsTD6Mod
 {
     public static bool ActuallyConsumeInsta;
-    public static bool AllowActuallyPlaceInsta;
+    public static bool InInstaMode;
+    public static TowerModel? InstaModel;
+    public static bool Warned;
 
     public static Dictionary<int, string> SavedPlacedInstas = null!;
 
@@ -173,12 +178,12 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
     }
 
     [HarmonyPatch(typeof(InputManager), nameof(InputManager.Update))]
-    internal class InputManager_EnterInstaMode
+    internal class InputManager_Update
     {
         [HarmonyPostfix]
         internal static void Postfix(InputManager __instance)
         {
-            if (!__instance.inInstaMode || AllowActuallyPlaceInsta)
+            if (!__instance.inInstaMode || InInstaMode)
             {
                 return;
             }
@@ -186,16 +191,17 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
             var useCount = __instance.instaButton.GetUseCount();
             var placed = GetTotalPlaced(__instance.instaModel.name);
             var cost = GetCostForThing(__instance.instaModel);
-            if (placed >= useCount || cost > InGame.instance.GetCash())
+            if (!Warned && (placed >= useCount || cost > InGame.instance.GetCash()))
             {
                 PopupScreen.instance.ShowPopup(PopupScreen.Placement.inGameCenter, "Real Insta Warning",
                     "You are placing an actual Insta Monkey, and doing so will remove it from your inventory. Are you sure you want to continue?",
-                    null, "Yes",
+                    new Action(() => Warned = true), "Yes",
                     new Action(__instance.CancelAllPlacementActions), "No", Popup.TransitionAnim.Scale
                 );
             }
 
-            AllowActuallyPlaceInsta = true;
+            InInstaMode = true;
+            InstaModel = __instance.instaModel;
         }
     }
 
@@ -215,7 +221,7 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         [HarmonyPostfix]
         internal static void Postfix(InputManager __instance)
         {
-            AllowActuallyPlaceInsta = false;
+            InInstaMode = false;
         }
     }
 
@@ -244,11 +250,12 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         //internal static void Postfix(TowerManager __instance, Tower __result, TowerModel def, bool isInstaTower)
         internal static void Postfix(Tower tower, TowerModel def, bool isInsta, bool isFromSave)
         {
-            //var isInsta = isInstaTower;
-            //var tower = __result;
-            if (isInsta && (!InGame.instance.IsCoop || tower.owner == Game.instance.GetNkGI().PeerID))
+            Warned = false;
+            if (tower.worth == 0 &&
+                def.name == InstaModel?.name &&
+                (!InGame.instance.IsCoop || tower.owner == Game.instance.GetNkGI().PeerID))
             {
-                var cost = GetCostForThing(def);
+                var cost = GetCostForThing(tower);
                 if (InGame.instance.GetCash() >= cost)
                 {
                     cost = GetCostForThing(tower);
