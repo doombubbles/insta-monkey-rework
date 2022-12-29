@@ -1,27 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.Models.Powers;
-using Assets.Scripts.Models.Profile;
-using Assets.Scripts.Models.Towers;
-using Assets.Scripts.Simulation;
-using Assets.Scripts.Simulation.Towers;
-using Assets.Scripts.Unity;
-using Assets.Scripts.Unity.Bridge;
-using Assets.Scripts.Unity.Player;
-using Assets.Scripts.Unity.UI_New.InGame;
-using Assets.Scripts.Unity.UI_New.InGame.RightMenu;
-using Assets.Scripts.Unity.UI_New.InGame.RightMenu.Powers;
-using Assets.Scripts.Unity.UI_New.InGame.StoreMenu;
-using Assets.Scripts.Unity.UI_New.Popups;
+using Il2CppAssets.Scripts.Models.Powers;
+using Il2CppAssets.Scripts.Models.Profile;
+using Il2CppAssets.Scripts.Models.Towers;
+using Il2CppAssets.Scripts.Simulation.Towers;
+using Il2CppAssets.Scripts.Unity;
+using Il2CppAssets.Scripts.Unity.Player;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.RightMenu;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.RightMenu.Powers;
+using Il2CppAssets.Scripts.Unity.UI_New.InGame.StoreMenu;
+using Il2CppAssets.Scripts.Unity.UI_New.Popups;
 using BTD_Mod_Helper;
-using BTD_Mod_Helper.Api;
-using BTD_Mod_Helper.Api.Enums;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
+using Il2CppTMPro;
 using InstaMonkeyRework;
 using MelonLoader;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -242,14 +238,14 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         }
     }
 
-    [HarmonyPatch(typeof(TowerManager.TowerCreateDef), nameof(TowerManager.TowerCreateDef.Invoke))]
-    //[HarmonyPatch(typeof(TowerManager), nameof(TowerManager.CreateTower))]
-    internal class TowerManager_CreateTower
+    [HarmonyPatch(typeof(Tower), nameof(Tower.OnPlace))]
+    internal static class Tower_OnPlace
     {
-        [HarmonyPostfix]
-        //internal static void Postfix(TowerManager __instance, Tower __result, TowerModel def, bool isInstaTower)
-        internal static void Postfix(Tower tower, TowerModel def, bool isInsta, bool isFromSave)
+        [HarmonyPrefix]
+        private static void Prefix(Tower __instance)
         {
+            var tower = __instance;
+            var def = __instance.towerModel;
             Warned = false;
             if (tower.worth == 0 &&
                 def.name == InstaModel?.name &&
@@ -268,6 +264,8 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
                     ActuallyConsumeInsta = true;
                     Game.instance.GetBtd6Player().ConsumeInstaTower(def.baseId, def.tiers);
                 }
+
+                InstaModel = null;
             }
         }
     }

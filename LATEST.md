@@ -1,1 +1,1 @@
-- Fixed BTD6 v33 issues with non-insta tower placements charging extra money
+- Fixed for BTD6 v34 / ML 0.6.0
