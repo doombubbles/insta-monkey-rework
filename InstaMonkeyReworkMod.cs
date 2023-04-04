@@ -325,20 +325,21 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         }
     }
 
-    [HarmonyPatch(typeof(TowerPurchaseButton), nameof(TowerPurchaseButton.OnPointerClick))]
+    [HarmonyPatch(typeof(ItemPurchaseButton), nameof(ItemPurchaseButton.OnPointerClick))]
     internal class TowerPurchaseButton_OnPointerClick
     {
         [HarmonyPostfix]
-        internal static void Postfix(TowerPurchaseButton __instance, PointerEventData eventData)
+        internal static void Postfix(ItemPurchaseButton __instance, PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Right &&
-                __instance.towerModel.IsBaseTower &&
-                !__instance.hero &&
+            if (__instance.Is(out TowerPurchaseButton button) && 
+                eventData.button == PointerEventData.InputButton.Right &&
+                button.towerModel.IsBaseTower &&
+                !button.IsHero &&
                 InGameData.CurrentGame.ArePowersAllowed())
             {
                 RightMenu.instance.ShowPowersMenu();
                 PowersMenu.instance.ShowInstaMonkeys();
-                InstaTowersMenu.instaTowersInstance.Show(__instance.towerModel);
+                InstaTowersMenu.instaTowersInstance.Show(button.towerModel);
 
                 InGame.instance.InputManager.ExitTowerMode();
             }
