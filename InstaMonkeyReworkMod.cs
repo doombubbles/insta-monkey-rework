@@ -111,7 +111,9 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
 
     public override void OnUpdate()
     {
-        if (InstaTowersMenu.instaTowersInstance != null && InGame.instance != null && InGame.instance.bridge != null)
+        if (InGame.instance == null || InGame.instance.bridge == null) return;
+
+        if (InstaTowersMenu.instaTowersInstance != null)
         {
             foreach (var button in InstaTowersMenu.instaTowersInstance
                          .GetComponentsInChildren<StandardInstaTowerButton>())
@@ -142,6 +144,26 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
                 }
             }
         }
+
+        var inputManager = InGame.instance.InputManager;
+        if (inputManager != null && inputManager.inInstaMode && !InInstaMode)
+        {
+            var useCount = inputManager.instaButton.GetUseCount();
+            var placed = GetTotalPlaced(inputManager.instaModel.name);
+            var cost = GetCostForThing(inputManager.instaModel);
+            if (!Warned && (placed >= useCount || cost > InGame.instance.GetCash()))
+            {
+                PopupScreen.instance.ShowPopup(PopupScreen.Placement.inGameCenter, "Real Insta Warning",
+                    "You are placing an actual Insta Monkey, and doing so will remove it from your inventory. Are you sure you want to continue?",
+                    new Action(() => Warned = true), "Yes",
+                    new Action(inputManager.CancelAllPlacementActions), "No", Popup.TransitionAnim.Scale
+                );
+            }
+
+            InInstaMode = true;
+            InstaModel = inputManager.instaModel;
+        }
+
     }
 
     public static int TextToInt(TextMeshProUGUI textMeshProUGUI)
@@ -170,34 +192,6 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         if (SavedPlacedInstas.ContainsKey(tower.Id.Id))
         {
             SavedPlacedInstas.Remove(tower.Id.Id);
-        }
-    }
-
-    [HarmonyPatch(typeof(InputManager), nameof(InputManager.Update))]
-    internal class InputManager_Update
-    {
-        [HarmonyPostfix]
-        internal static void Postfix(InputManager __instance)
-        {
-            if (!__instance.inInstaMode || InInstaMode)
-            {
-                return;
-            }
-
-            var useCount = __instance.instaButton.GetUseCount();
-            var placed = GetTotalPlaced(__instance.instaModel.name);
-            var cost = GetCostForThing(__instance.instaModel);
-            if (!Warned && (placed >= useCount || cost > InGame.instance.GetCash()))
-            {
-                PopupScreen.instance.ShowPopup(PopupScreen.Placement.inGameCenter, "Real Insta Warning",
-                    "You are placing an actual Insta Monkey, and doing so will remove it from your inventory. Are you sure you want to continue?",
-                    new Action(() => Warned = true), "Yes",
-                    new Action(__instance.CancelAllPlacementActions), "No", Popup.TransitionAnim.Scale
-                );
-            }
-
-            InInstaMode = true;
-            InstaModel = __instance.instaModel;
         }
     }
 
@@ -331,7 +325,7 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         [HarmonyPostfix]
         internal static void Postfix(ItemPurchaseButton __instance, PointerEventData eventData)
         {
-            if (__instance.Is(out TowerPurchaseButton button) && 
+            if (__instance.Is(out TowerPurchaseButton button) &&
                 eventData.button == PointerEventData.InputButton.Right &&
                 button.towerModel.IsBaseTower &&
                 !button.IsHero &&
