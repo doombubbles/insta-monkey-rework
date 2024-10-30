@@ -73,15 +73,16 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
         var cost = Game.instance.model.GetTowerFromId(tower.towerModel.name).cost;
 
         var towerManager = InGame.instance.GetTowerManager();
-        var zoneDiscount = towerManager.GetZoneDiscount(tower.Position.ToVector3(), 0, 0);
+        var zoneDiscount =
+            towerManager.GetZoneDiscount(tower.towerModel, tower.Position.ToVector3(), 0, 0, tower.owner);
         var discountMultiplier = towerManager.GetDiscountMultiplier(zoneDiscount);
         cost *= 1 - discountMultiplier;
 
         foreach (var appliedUpgrade in tower.towerModel.GetAppliedUpgrades())
         {
             float upgradeCost = appliedUpgrade.cost;
-            zoneDiscount = towerManager.GetZoneDiscount(tower.Position.ToVector3(), appliedUpgrade.path,
-                appliedUpgrade.tier);
+            zoneDiscount = towerManager.GetZoneDiscount(tower.towerModel, tower.Position.ToVector3(),
+                appliedUpgrade.path, appliedUpgrade.tier, tower.owner, appliedUpgrade.name);
             discountMultiplier = towerManager.GetDiscountMultiplier(zoneDiscount);
             upgradeCost *= 1 - discountMultiplier;
             cost += upgradeCost;
@@ -163,7 +164,6 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
             InInstaMode = true;
             InstaModel = inputManager.instaModel;
         }
-
     }
 
     public static int TextToInt(TextMeshProUGUI textMeshProUGUI)
