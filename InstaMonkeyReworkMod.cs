@@ -8,18 +8,17 @@ using Il2CppAssets.Scripts.Simulation.Towers;
 using Il2CppAssets.Scripts.Unity;
 using Il2CppAssets.Scripts.Unity.Player;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame;
-using Il2CppAssets.Scripts.Unity.UI_New.InGame.RightMenu;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.RightMenu.Powers;
 using Il2CppAssets.Scripts.Unity.UI_New.InGame.StoreMenu;
 using Il2CppAssets.Scripts.Unity.UI_New.Popups;
 using BTD_Mod_Helper;
+using BTD_Mod_Helper.Api;
 using BTD_Mod_Helper.Extensions;
 using HarmonyLib;
 using Il2CppTMPro;
 using InstaMonkeyRework;
 using MelonLoader;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
 [assembly: MelonInfo(typeof(InstaMonkeyReworkMod), ModHelperData.Name, ModHelperData.Version, ModHelperData.RepoOwner)]
@@ -114,10 +113,10 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
     {
         if (InGame.instance == null || InGame.instance.bridge == null) return;
 
-        if (InstaTowersMenu.instaTowersInstance != null)
+        if (InGame.instance?.playerContexts?.FirstOrDefault()?.powersMenu?.Is(out PowersMenu powersMenu) == true &&
+            powersMenu.instaTowersMenu.Is(out var instaTowersMenu))
         {
-            foreach (var button in InstaTowersMenu.instaTowersInstance
-                         .GetComponentsInChildren<StandardInstaTowerButton>())
+            foreach (var button in instaTowersMenu.GetComponentsInChildren<StandardInstaTowerButton>())
             {
                 var costText = button.GetComponentsInChildren<TextMeshProUGUI>()
                     .FirstOrDefault(text => text.name == "Cost");
@@ -330,11 +329,12 @@ public class InstaMonkeyReworkMod : BloonsTD6Mod
                 !__instance.IsHero &&
                 InGameData.CurrentGame.ArePowersAllowed())
             {
-                RightMenu.instance.ShowPowersMenu();
-                PowersMenu.instance.ShowInstaMonkeys();
-                InstaTowersMenu.instaTowersInstance.Show(__instance.towerModel);
-
+                var context = InGame.instance.playerContexts.First();
+                context.rightMenu.ShowPowersMenu();
+                var powersMenu = context.powersMenu.Cast<PowersMenu>();
+                powersMenu.ShowInstaMonkeys();
                 InGame.instance.InputManager.ExitTowerMode();
+                TaskScheduler.ScheduleTask(() => powersMenu.instaTowersMenu.Show(__instance.towerModel));
 
                 return false;
             }
