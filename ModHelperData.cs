@@ -12,5 +12,6 @@ public static class ModHelperData
         "Price is discounted from the full amount based on the tier of the insta.";
 
     public const string RepoOwner = "doombubbles";
-    public const string RepoName = "insta-monkey-rework";
+    public const string PrevRepoName = "insta-monkey-rework";
+    public const string RepoName = "InstaMonkeyRework";
 }
